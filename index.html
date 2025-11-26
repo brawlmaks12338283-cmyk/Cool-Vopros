@@ -1,37 +1,130 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cool Vopros — Ошибка</title>
-  <style>
+<meta charset="UTF-8">
+<title>Band Vopros — Alpha</title>
+<style>
     body {
-      margin: 0;
-      height: 100vh;
-      background: #0a0a0a;
-      color: #ffffff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        margin: 0;
+        padding: 0;
     }
-    h1 {
-      font-size: 2.2em;
-      color: #ff4b4b;
-      margin-bottom: 10px;
+    header {
+        background: white;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.15);
     }
-    p {
-      font-size: 1.1em;
-      color: #cccccc;
-      max-width: 500px;
+    #logo {
+        width: 220px;
     }
-    .sad {
-      font-size: 60px;
-      margin-bottom: 20px;
+    .container {
+        max-width: 800px;
+        margin: 30px auto;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    footer {
-      position: absolute;
-      bottom: 15px
+    .question {
+        border-bottom: 1px solid #ddd;
+        padding: 10px 0;
+    }
+    button {
+        margin-top: 5px;
+        padding: 5px 12px;
+        border: none;
+        background: #4a7cff;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #345fe0;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <!-- SVG логотип -->
+    <svg id="logo" viewBox="0 0 400 130">
+        <rect width="100%" height="100%" fill="#4a7cff"/>
+        <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"
+              font-size="42" fill="white" font-weight="700">Band Vopros</text>
+        <text x="50%" y="80%" dominant-baseline="middle" text-anchor="middle"
+              font-size="22" fill="#dfe7ff">Alpha</text>
+    </svg>
+</header>
+
+<div class="container">
+    <h2>Задать вопрос</h2>
+    <input type="text" id="inputQuestion" placeholder="Введите вопрос..." style="width:80%; padding: 10px;">
+    <button onclick="addQuestion()">Отправить</button>
+
+    <h2 style="margin-top: 30px;">Вопросы</h2>
+    <div id="questions"></div>
+</div>
+
+<script>
+
+// загрузка данных
+let questions = JSON.parse(localStorage.getItem("questions") || "[]");
+
+// лайки пользователей
+let userLikes = JSON.parse(localStorage.getItem("userLikes") || "{}");
+
+function save() {
+    localStorage.setItem("questions", JSON.stringify(questions));
+    localStorage.setItem("userLikes", JSON.stringify(userLikes));
+}
+
+// добавление вопроса
+function addQuestion() {
+    let text = document.getElementById("inputQuestion").value.trim();
+    if (!text) return;
+
+    questions.push({ text, likes: 0 });
+    save();
+    render();
+    document.getElementById("inputQuestion").value = "";
+}
+
+// поставить / убрать лайк
+function toggleLike(id) {
+    if (!userLikes[id]) {
+        userLikes[id] = true;
+        questions[id].likes += 1;
+    } else {
+        userLikes[id] = false;
+        questions[id].likes -= 1;
+    }
+    save();
+    render();
+}
+
+// отрисовка
+function render() {
+    let box = document.getElementById("questions");
+    box.innerHTML = "";
+
+    questions.forEach((q, i) => {
+        let liked = userLikes[i] ? "❤️" : "🤍";
+
+        box.innerHTML += `
+            <div class="question">
+                <p>${q.text}</p>
+                <button onclick="toggleLike(${i})">${liked} ${q.likes}</button>
+            </div>
+        `;
+    });
+}
+
+render();
+
+</script>
+
+</body>
+</html>
